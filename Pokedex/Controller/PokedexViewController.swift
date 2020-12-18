@@ -23,19 +23,21 @@ class PokedexViewController: UIViewController, UICollectionViewDelegate, UIColle
         let name = defaults.string(forKey: "keyTrainerName")
         lblTrainerName.text = name!.uppercased()
         imgCharacter.image = UIImage(named: character!)
-        
-        let pokemons = Pokemon().getAllPokemons()
-        if pokemons.isEmpty {
-            getFromWeb()
-        } else {
-            listPokemon = pokemons
-        }
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         let pokemons = Pokemon().getAllPokemons()
-        if !pokemons.isEmpty {
+        if pokemons.isEmpty {
+            let alert = UIAlertController(title: nil, message: "", preferredStyle: .alert)
+            
+            let jeremyGif = UIImage.gifImageWithName("loading")
+            let imageView = UIImageView(image: jeremyGif)
+            imageView.frame = CGRect(x: -40, y: -(self.view.frame.size.width - 80) / 2, width: self.view.frame.size.width - 26, height: self.view.frame.size.width - 80)
+            alert.view.addSubview(imageView)
+            present(alert, animated: true, completion: nil)
+            getFromWeb()
+        } else {
             listPokemon = pokemons
             collectionView.reloadData()
         }
@@ -79,6 +81,10 @@ class PokedexViewController: UIViewController, UICollectionViewDelegate, UIColle
                     }
                     if index < self.listPokemon.count - 1 {
                         self.getImage(index: index+1)
+                    } else {
+                        DispatchQueue.main.async {
+                            self.dismiss(animated: false, completion: nil)
+                        }
                     }
                 }
             } else {
